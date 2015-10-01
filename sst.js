@@ -4,6 +4,14 @@
 
 	var elementArray = [];
 
+	function applyDirectStyles(element, styles) {
+		for(var j = 0, jk = Object.keys(styles), jl = jk.length; j < jk.length; j++) {
+			let thiskey = jk[j];
+			element.style[thiskey] = styles[thiskey];
+		}		
+		return element;
+	}
+	
 	function listElements(qSA) {
 
 		// don't show more than <sanity> elements in list
@@ -61,40 +69,48 @@
 	
 	var c = document.createElement('DIV');
 	c.id = 'classtester-container';
-	c.style.position = "fixed";
-	c.style.bottom = "20px";
-	c.style.left = "30px";
-	c.style.zIndex = "999";
+	applyDirectStyles(c, {
+		position: "fixed",
+		bottom: "20px",
+		left: "30px",
+		zIndex: "999"
+	});
 	
 	document.body.appendChild(c);
 
 	c.innerHTML = '<div id="classtester-elements"> </div><div id="classtester-messages"> </div><div id="classtester-input"> <input id="classtester" type="text" /> </div>';
 
 	var m = document.getElementById('classtester-messages');
-	m.style.boxShadow = "0 0 22px #aaaaaa";
-	m.style.padding = '4px 8px';
+	applyDirectStyles(m, {
+		boxShadow: "0 0 22px #aaaaaa",
+		padding: "4px 8px"
+	});
 	
 	var el = document.getElementById('classtester-elements');
-	el.style.boxShadow = "0 0 22px #aaaaaa";
-	el.style.padding = '0';
-	el.style.maxHeight = '400px';
-	el.style.overflow = 'auto';
-	el.style.backgroundColor = "#ffffff";
+	applyDirectStyles(el, {
+		boxShadow: "0 0 22px #aaaaaa",
+		padding: "0",
+		maxHeight: "400px",
+		overflow: "auto",
+		backgroundColor: "#ffffff"
+	});
 	
 	var cc = document.getElementById('classtester-input');
-	cc.style.boxShadow = "0 0 22px #aaaaaa";
+	applyDirectStyles(cc, { boxShadow: "0 0 22px #aaaaaa" });
 	
 	var i = document.getElementById('classtester');
 	i.type = 'text';
 	i.id = 'classtester';
-	i.style.width = "100%";
-	i.style.minWidth = "300px";
-	i.style.height = "30px";
-	i.style.fontSize = "20px";
-	i.style.padding = '4px 8px';
-	i.style.margin = '0';
-	i.style.backgroundColor = "#fff";
-	i.style.color = "#444444";
+	applyDirectStyles(i, {
+		width: "100%",
+		minWidth: "300px",
+		height: "30px",
+		fontSize: "20px",
+		padding: "4px 8px",
+		margin: "0",
+		backgroundColor: "#ffffff",
+		color: "#444444"
+	});
 	var oldselector = '';
 
 	function updateElementList() {
@@ -123,23 +139,32 @@
 		updateElementList.apply(this);
 	};
 	
-	el.onclick = function(event) {
-		event = event || window.event;
-		var target = event.target || event.srcElement;
-	    while(target != el) { 
-			if (
-				target.classList.contains('elementclass') ||
-				target.classList.contains('elementtag') ||
-				target.classList.contains('elementid')
-			) {
-				i.value = target.innerText;
-				updateElementList.apply(i);
-				return true;
+	function delegateEventByClass(eventname, container, classes, callback) {
+		container['on' + eventname] = function(event) {
+			event = event || window.event;
+			var target = event.target || event.srcElement;
+			if(typeof classes === "string") {
+				classes = [classes];
 			}
-			target = target.parentNode;
-		}
-	};
+			while(target && target != container) { 
+				let targetClasses = ' ' + target.className + ' ';
+				for(var j = 0, jl = classes.length; j < jl; j++) {
+					if(targetClasses.indexOf(' ' + classes[j] + ' ') > -1) {
+						callback.apply(target);
+						break;
+					}
+				}
+				target = target.parentNode;
+			}
+		};
+	}
 
+	delegateEventByClass('click', el, ['elementclass', 'elementtag', 'elementid'], function(event) {
+		i.value = this.innerText;
+		updateElementList.apply(i);
+		return false;
+	});
+	
 	el.onmouseover = function(event) {
 		event = event || window.event;
 		var target = event.target || event.srcElement;
