@@ -1,25 +1,38 @@
 (function() {
 
+	'use strict';
+
 	var elementArray = [];
 
-	function listElements(qsA) {
+	function listElements(qSA) {
+
+		// don't show more than <sanity> elements in list
+		var sanity = 1000;
+
 		if(elementArray.length) {
+			// reset any remaining outlines on elements before clearing the array
 			elementArray.forEach(function(e) {
 				e.style.outline = '';
 			});
 		}
+		elementArray = [];
+
 		m.style.backgroundColor = '#9f9';
 		m.fontStyle = '';
-		m.innerHTML = qsA.length + ' Matching Elements';
+		if(qSA.length <= sanity) {
+			m.innerHTML = qSA.length + ' Matching Elements';
+		} else {
+			m.innerHTML = qSA.length + ' Matching Elements <span class="lighter-text">(' + sanity + ' shown)</span>';
+		}
 		var elementHtml = '';
 		var elementId = 0;
-		elementArray = [];
-		[].forEach.call(qsA, function(thisElement) {
+		for(var k = 0, kl = (qSA.length <= sanity) ? qSA.length : sanity; k < kl; k++) {
+			let thisElement = qSA[k];
 			elementArray[++elementId] = thisElement;
 			elementHtml += '<div class="element" data-elementid="' + elementId + '">';
 			elementHtml += '<a href="#" class="elementtag"><strong>' + thisElement.tagName + '</strong></a>';
 			if(thisElement.id.length) {
-				elementHtml += '<span class="elementid">#' + thisElement.id + '</span>';
+				elementHtml += '<a href="#" class="elementid">#' + thisElement.id + '</a>';
 			}
 			var classListLength = thisElement.classList.length;
 			if(classListLength) {
@@ -30,7 +43,7 @@
 				elementHtml += '</span>';
 			}
 			elementHtml += '</div>';
-		}); 
+		}
 		el.innerHTML = elementHtml;
 	}
 
@@ -66,6 +79,7 @@
 	el.style.padding = '0';
 	el.style.maxHeight = '400px';
 	el.style.overflow = 'auto';
+	el.style.backgroundColor = "#ffffff";
 	
 	var cc = document.getElementById('classtester-input');
 	cc.style.boxShadow = "0 0 22px #aaaaaa";
@@ -78,6 +92,7 @@
 	i.style.height = "30px";
 	i.style.fontSize = "20px";
 	i.style.padding = '4px 8px';
+	i.style.margin = '0';
 	i.style.backgroundColor = "#fff";
 	i.style.color = "#444444";
 	var oldselector = '';
@@ -112,12 +127,11 @@
 		event = event || window.event;
 		var target = event.target || event.srcElement;
 	    while(target != el) { 
-			if (target.classList.contains('elementclass')) {
-				i.value = target.innerText;
-				updateElementList.apply(i);
-				return true;
-			}
-			if (target.classList.contains('elementtag')) {
+			if (
+				target.classList.contains('elementclass') ||
+				target.classList.contains('elementtag') ||
+				target.classList.contains('elementid')
+			) {
 				i.value = target.innerText;
 				updateElementList.apply(i);
 				return true;
@@ -160,8 +174,10 @@
 	var styleSheet = document.styleSheets[ssindex - 1];
 	styleSheet.insertRule('#classtester-container .element { padding: 4px 8px; margin: 2px; border: 1px solid #dddddd; background-color: #eeeeff; box-shadow: 0 0 22px #ffffff; }', 0);
 	styleSheet.insertRule('#classtester-container .element .elementid { color: #008800; }', 0);
-	styleSheet.insertRule('#classtester-container .element .elementclasses { color: #664400; }', 0);
+	styleSheet.insertRule('#classtester-container .element .elementclass { color: #664400; }', 0);
 	styleSheet.insertRule('#classtester-container .element .elementtag { color: #444444; }', 0);
+	styleSheet.insertRule('#classtester-container a:hover { text-decoration: underline; }', 0);
+	styleSheet.insertRule('#classtester-container .lighter-text { color: #999999 !important; }', 0);
 	
 	infoMessage('Type a CSS selector to begin');
 	
