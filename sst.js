@@ -1,13 +1,23 @@
 (function() {
 
+	var elementArray = [];
+
 	function listElements(qsA) {
+		if(elementArray.length) {
+			elementArray.forEach(function(e) {
+				e.style.outline = '';
+			});
+		}
 		m.style.backgroundColor = '#9f9';
 		m.fontStyle = '';
 		m.innerHTML = qsA.length + ' Matching Elements';
 		var elementHtml = '';
+		var elementId = 0;
+		elementArray = [];
 		[].forEach.call(qsA, function(thisElement) {
-			elementHtml += '<div class="element">';
-			elementHtml += '<strong>' + thisElement.tagName + '</strong>';
+			elementArray[++elementId] = thisElement;
+			elementHtml += '<div class="element" data-elementid="' + elementId + '">';
+			elementHtml += '<a href="#" class="elementtag"><strong>' + thisElement.tagName + '</strong></a>';
 			if(thisElement.id.length) {
 				elementHtml += '<span class="elementid">#' + thisElement.id + '</span>';
 			}
@@ -20,7 +30,7 @@
 				elementHtml += '</span>';
 			}
 			elementHtml += '</div>';
-		});
+		}); 
 		el.innerHTML = elementHtml;
 	}
 
@@ -101,22 +111,58 @@
 	el.onclick = function(event) {
 		event = event || window.event;
 		var target = event.target || event.srcElement;
-	    while(target != table) { 
+	    while(target != el) { 
 			if (target.classList.contains('elementclass')) {
+				i.value = target.innerText;
+				updateElementList.apply(i);
+				return true;
+			}
+			if (target.classList.contains('elementtag')) {
 				i.value = target.innerText;
 				updateElementList.apply(i);
 				return true;
 			}
 			target = target.parentNode;
 		}
-	}
-	
+	};
+
+	el.onmouseover = function(event) {
+		event = event || window.event;
+		var target = event.target || event.srcElement;
+	    while(target != el) { 
+			if (target.dataset && target.dataset.elementid) { 
+				var thisElement = elementArray[target.dataset.elementid];
+				if(typeof thisElement === 'object' && thisElement.nodeName) {
+					thisElement.style.outline = target.style.outline = '2px solid dodgerblue';
+				}
+				return true;
+			}
+			target = target.parentNode;
+		}
+	};
+
+	el.onmouseout = function(event) {
+		event = event || window.event;
+		var target = event.target || event.srcElement;
+	    while(target != el) { 
+			if (target.dataset && target.dataset.elementid) { 
+				var thisElement = elementArray[target.dataset.elementid];
+				if(typeof thisElement === 'object' && thisElement.nodeName) {
+					thisElement.style.outline = target.style.outline = '';
+				}
+				return true;
+			}
+			target = target.parentNode;
+		}
+	};
+
 	var ssindex = document.styleSheets.length;
 	var styleSheet = document.styleSheets[ssindex - 1];
-	styleSheet.insertRule('#classtester-container .element { padding: 4px 8px; border: 1px solid #dddddd; background-color: #eeeeff; box-shadow: 0 0 22px #ffffff; }', 0);
+	styleSheet.insertRule('#classtester-container .element { padding: 4px 8px; margin: 2px; border: 1px solid #dddddd; background-color: #eeeeff; box-shadow: 0 0 22px #ffffff; }', 0);
 	styleSheet.insertRule('#classtester-container .element .elementid { color: #008800; }', 0);
 	styleSheet.insertRule('#classtester-container .element .elementclasses { color: #664400; }', 0);
+	styleSheet.insertRule('#classtester-container .element .elementtag { color: #444444; }', 0);
 	
 	infoMessage('Type a CSS selector to begin');
 	
-})()
+})();
