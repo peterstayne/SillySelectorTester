@@ -5,8 +5,9 @@
 	var elementArray = [];
 
 	function applyDirectStyles(element, styles) {
+		var thiskey;
 		for(var j = 0, jk = Object.keys(styles), jl = jk.length; j < jk.length; j++) {
-			let thiskey = jk[j];
+			thiskey = jk[j];
 			element.style[thiskey] = styles[thiskey];
 		}		
 		return element;
@@ -34,8 +35,9 @@
 		}
 		var elementHtml = '';
 		var elementId = 0;
+		var thisElement;
 		for(var k = 0, kl = (qSA.length <= sanity) ? qSA.length : sanity; k < kl; k++) {
-			let thisElement = qSA[k];
+			thisElement = qSA[k];
 			elementArray[++elementId] = thisElement;
 			elementHtml += '<div class="element" data-elementid="' + elementId + '">';
 			elementHtml += '<a href="#" class="elementtag"><strong>' + thisElement.tagName + '</strong></a>';
@@ -146,8 +148,9 @@
 			if(typeof classes === "string") {
 				classes = [classes];
 			}
+			var targetClasses;
 			while(target && target != container) { 
-				let targetClasses = ' ' + target.className + ' ';
+				targetClasses = ' ' + target.className + ' ';
 				for(var j = 0, jl = classes.length; j < jl; j++) {
 					if(targetClasses.indexOf(' ' + classes[j] + ' ') > -1) {
 						callback.apply(target);
@@ -160,7 +163,7 @@
 	}
 
 	delegateEventByClass('click', el, ['elementclass', 'elementtag', 'elementid'], function(event) {
-		i.value = this.innerText;
+		i.value = this.textContent;
 		updateElementList.apply(i);
 		return false;
 	});
