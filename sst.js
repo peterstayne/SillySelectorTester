@@ -48,7 +48,7 @@
 			if(classListLength) {
 				elementHtml += '<span class="elementclasses">';
 				for( var j = 0; j < classListLength; j++ ) {
-					elementHtml += '<a href="javascript:void(0)" class="elementclass">.' + thisElement.classList.item(j) + '</a>';
+					elementHtml += '<a href="#" class="elementclass">.' + thisElement.classList.item(j) + '</a>';
 				}
 				elementHtml += '</span>';
 			}
@@ -144,6 +144,7 @@
 	function delegateEventByClass(eventname, container, classes, callback) {
 		container['on' + eventname] = function(event) {
 			event = event || window.event;
+			event.preventDefault();
 			var target = event.target || event.srcElement;
 			if(typeof classes === "string") {
 				classes = [classes];
